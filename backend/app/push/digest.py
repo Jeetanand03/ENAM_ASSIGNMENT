@@ -52,7 +52,8 @@ def ingest(symbols: list[str] | None = None, settings: dict | None = None, use_l
                           (a["id"], sym, a["ts"], a["subject"], a.get("summary"), a["category_raw"], a.get("pdf_url"),
                            cat, csrc, sc["score"], json.dumps(sc["parts"]), sc["tier"], headline_for(a, cat)))
             stats["fetched"] += 1
-    db.kv_set("last_ingest", datetime.now().isoformat())
+    from datetime import timezone
+    db.kv_set("last_ingest", datetime.now(timezone(timedelta(hours=5, minutes=30))).replace(microsecond=0, tzinfo=None).isoformat())
     from .enrich import enrich_top
     stats["enriched"] = enrich_top()
     return stats

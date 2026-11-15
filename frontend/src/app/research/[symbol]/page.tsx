@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
-import Link from "next/link";
 import { apiGet } from "@/lib/api";
 import { useStore } from "@/lib/store";
 import type { Research, Ask, Card, PriceSnap, Verdict, Cited } from "@/lib/types";
@@ -146,7 +145,9 @@ function PVD({ d }: { d: NonNullable<NonNullable<Research["modules"]>["promised_
 function fmtRange(row: Verdict) {
   const [lo, hi] = row.range; if (lo === null) return "—";
   const u = row.unit && row.unit !== "percent" ? row.unit : "%";
-  return lo === hi || hi === null ? `${lo}${u}` : `${lo}–${hi}${u}`;
+  const n = (v: number) => v.toLocaleString("en-IN");
+  if (/cr/i.test(u)) return `₹${n(lo)}${hi !== null && hi !== lo ? `–${n(hi)}` : hi === null ? "+" : ""} cr`;
+  return hi === null ? `${n(lo)}${u}+` : lo === hi ? `${n(lo)}${u}` : `${n(lo)}–${n(hi)}${u}`;
 }
 
 function Snapshot({ r }: { r: Research }) {

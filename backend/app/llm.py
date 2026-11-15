@@ -15,18 +15,22 @@ log = logging.getLogger("finn.llm")
 
 # USD per 1M tokens (input, output) — used only for the cost table in the README.
 PRICES = {
+    "groq/llama-3.3-70b-versatile": (0.0, 0.0),  # free tier (list price 0.59/0.79 on the paid tier)
     "gemini-2.5-flash": (0.30, 2.50), "claude-haiku-4-5": (1.00, 5.00), "claude-sonnet-4-5": (3.00, 15.00),
 }
-MODELS = {"cheap": ["gemini-2.5-flash", "claude-haiku-4-5"], "strong": ["claude-sonnet-4-5", "gemini-2.5-flash"]}
+MODELS = {"cheap": ["gemini-2.5-flash", "groq/llama-3.3-70b-versatile", "claude-haiku-4-5"],
+          "strong": ["claude-sonnet-4-5", "groq/llama-3.3-70b-versatile", "gemini-2.5-flash"]}
 
 
 def available() -> dict:
-    return {"gemini": bool(config.GEMINI_API_KEY), "anthropic": bool(config.ANTHROPIC_API_KEY)}
+    return {"gemini": bool(config.GEMINI_API_KEY), "groq": bool(config.GROQ_API_KEY), "anthropic": bool(config.ANTHROPIC_API_KEY)}
 
 
 def _pick(tier: str) -> str | None:
     for m in MODELS[tier]:
         if m.startswith("gemini") and config.GEMINI_API_KEY:
+            return m
+        if m.startswith("groq/") and config.GROQ_API_KEY:
             return m
         if m.startswith("claude") and config.ANTHROPIC_API_KEY:
             return m
@@ -34,6 +38,14 @@ def _pick(tier: str) -> str | None:
 
 
 def _call(model: str, system: str, prompt: str, max_tokens: int) -> tuple[str, int, int]:
+    if model.startswith("groq/"):  # OpenAI-compatible endpoint, free tier
+        from .sources.http import client
+        r = client().post("https://api.groq.com/openai/v1/chat/completions",
+                          headers={"Authorization": f"Bearer {config.GROQ_API_KEY}"},
+                          json={"model": model.split("/", 1)[1], "temperature": 0, "max_tokens": max_tokens,
+                                "messages": [{"role": "system", "content": system}, {"role": "user", "content": prompt}]})
+        r.raise_for_status(); j = r.json(); u = j.get("usage", {})
+        return j["choices"][0]["message"]["content"] or "", int(u.get("prompt_tokens", 0)), int(u.get("completion_tokens", 0))
     if model.startswith("gemini"):
         from google import genai
         from google.genai import types

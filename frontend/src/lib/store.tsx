@@ -17,9 +17,9 @@ type Store = {
 const Ctx = createContext<Store | null>(null);
 const DEFAULTS: Settings = { volume_multiple: 2, price_move_pct: 4, starred_categories: ["results", "M&A", "management_change"], digest_window: "24h" };
 
+/** "Now" in exchange time (IST), as a naive ISO string — filings are IST-stamped, wherever the viewer is. */
 function localISO(d: Date) {
-  const p = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}:00`;
+  return new Date(d.getTime() + 330 * 60000).toISOString().slice(0, 16) + ":00";
 }
 
 export function StoreProvider({ children }: { children: React.ReactNode }) {
@@ -39,7 +39,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
   const setAsOf = useCallback((v: string | null) => {
     setAsOfState(v);
-    try { v ? localStorage.setItem("finn.asOf", v) : localStorage.removeItem("finn.asOf"); } catch {}
+    try { if (v) localStorage.setItem("finn.asOf", v); else localStorage.removeItem("finn.asOf"); } catch {}
   }, []);
 
   const saveSettings = useCallback(async (p: Partial<Settings>) => {

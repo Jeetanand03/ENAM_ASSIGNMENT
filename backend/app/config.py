@@ -21,6 +21,7 @@ SNAPSHOT_FIRST = os.getenv("FINN_SNAPSHOT_FIRST", "0") == "1"  # serverless: ser
 
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
+GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 TAVILY_API_KEY = os.getenv("TAVILY_API_KEY", "")
 
 # Mock portfolio: 20 NSE names across sectors and sizes.

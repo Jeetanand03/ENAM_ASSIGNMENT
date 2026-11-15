@@ -24,7 +24,6 @@ export default function FeedCard({ card, compact = false }: { card: Card; compac
       try { const { data } = await apiGet<Enrich>(`/api/announcements/${card.id}/enrich`, { timeoutMs: 40000 }); setEnrich(data); } catch {} finally { setLoading(false); }
     }
   };
-  const tierChip = card.tier === "must" ? "chip-accent" : card.tier === "look" ? "" : "";
   const catTone = card.category === "results" || card.category === "M&A" ? "chip-accent" : card.category === "litigation" || card.category === "pledging" ? "chip-down" : "";
   const reaction = card.why?.reaction_why;
 

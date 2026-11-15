@@ -18,7 +18,9 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], all
 
 
 def _now() -> str:
-    return datetime.now().replace(microsecond=0).isoformat()
+    """Exchange time (IST), naive — filings are timestamped in IST and the server may run in UTC."""
+    from datetime import timedelta, timezone
+    return datetime.now(timezone(timedelta(hours=5, minutes=30))).replace(microsecond=0, tzinfo=None).isoformat()
 
 
 def _bootstrap():
@@ -35,7 +37,7 @@ def _bootstrap():
 
 def _stale() -> bool:
     last = db.kv_get("last_ingest")
-    return not last or (datetime.now() - datetime.fromisoformat(last)).total_seconds() > 1800
+    return not last or (datetime.fromisoformat(_now()) - datetime.fromisoformat(last)).total_seconds() > 1800
 
 
 _boot_lock = threading.Lock()
