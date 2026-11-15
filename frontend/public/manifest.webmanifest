@@ -1,0 +1,12 @@
+{
+  "name": "FINN — Financial Investment Agent",
+  "short_name": "FINN",
+  "description": "Shows an investor only what matters: a prioritised filings digest, threshold alerts, and primary-source research on any NSE ticker.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f6f6f4",
+  "theme_color": "#f6f6f4",
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

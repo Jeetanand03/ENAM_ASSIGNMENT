@@ -1,0 +1,6 @@
+frontend
+backend/.venv
+backend/data
+data/docs
+docs
+*.pdf

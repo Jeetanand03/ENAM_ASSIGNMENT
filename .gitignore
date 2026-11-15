@@ -1,0 +1,22 @@
+# secrets
+.env
+.env.*
+!.env.example
+# python
+backend/.venv/
+__pycache__/
+*.pyc
+backend/data/finn.db
+backend/data/finn.db-journal
+# raw PDFs are large; snapshots (JSON) are committed
+data/docs/
+backend/data/docs/
+# node
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+.vercel
+# misc
+.DS_Store
+*.log
+backend/data/
